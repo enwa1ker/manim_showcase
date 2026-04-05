@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manim — Математические Анимации на Python</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0a0c12;
+  --bg2: #0f1118;
+  --bg3: #141720;
+  --blue: #4f8ef7;
+  --cyan: #00d4ff;
+  --gold: #f5c842;
+  --green: #50fa7b;
+  --pink: #ff6b9d;
+  --orange: #ffb347;
+  --text: #e8eaf0;
+  --muted: #8892a4;
+  --border: rgba(79,142,247,0.15);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Libre Baskerville', serif;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+/* ── Grid Background ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(79,142,247,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,142,247,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 3rem;
+  backdrop-filter: blur(12px);
+  background: rgba(10,12,18,0.85);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.1rem;
+  color: var(--cyan);
+  letter-spacing: -0.02em;
+}
+
+.nav-logo span { color: var(--gold); }
+
+nav ul {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+
+nav ul a {
+  text-decoration: none;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+nav ul a:hover { color: var(--cyan); }
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 8rem 2rem 4rem;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.hero-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-content { position: relative; z-index: 2; max-width: 820px; }
+
+.hero-tag {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  border: 1px solid rgba(0,212,255,0.3);
+  padding: 0.35rem 1rem;
+  border-radius: 2px;
+  margin-bottom: 2rem;
+  animation: fadeUp 0.6s ease both;
+}
+
+.hero h1 {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.7s 0.1s ease both;
+}
+
+.hero h1 .accent { color: var(--cyan); }
+.hero h1 .accent2 { color: var(--gold); }
+
+.hero p {
+  font-size: 1.15rem;
+  color: var(--muted);
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+  animation: fadeUp 0.7s 0.2s ease both;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeUp 0.7s 0.3s ease both;
+}
+
+.btn {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  padding: 0.75rem 2rem;
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+}
+
+.btn-primary {
+  background: var(--cyan);
+  color: #0a0c12;
+  border: none;
+  font-weight: 700;
+}
+
+.btn-primary:hover {
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,212,255,0.3);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.btn-outline:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  transform: translateY(-2px);
+}
+
+/* ── SECTIONS ── */
+section {
+  position: relative;
+  z-index: 1;
+  padding: 6rem 2rem;
+}
+
+.container { max-width: 1100px; margin: 0 auto; }
+
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 0.75rem;
+}
+
+.section-title {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+/* ── WHAT IS MANIM ── */
+.what-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin-top: 3rem;
+}
+
+.what-text p {
+  color: var(--muted);
+  margin-bottom: 1.2rem;
+  font-size: 1rem;
+}
+
+.what-text strong { color: var(--text); }
+
+.info-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.info-card:hover {
+  border-color: rgba(79,142,247,0.4);
+  transform: translateX(4px);
+}
+
+.info-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.info-card h4 {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--cyan);
+  margin-bottom: 0.3rem;
+}
+
+.info-card p {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── INSTALL ── */
+.install-section {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.install-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.step {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.step-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: rgba(79,142,247,0.1);
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  line-height: 1;
+}
+
+.step h4 {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.code-block {
+  background: #080a10;
+  border: 1px solid rgba(79,142,247,0.12);
+  border-radius: 5px;
+  padding: 0.85rem 1rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.8rem;
+  color: var(--green);
+  overflow-x: auto;
+  line-height: 1.7;
+  position: relative;
+}
+
+.code-block .comment { color: #546e7a; }
+.code-block .keyword { color: var(--pink); }
+.code-block .string { color: var(--gold); }
+.code-block .func { color: var(--cyan); }
+.code-block .cls { color: var(--orange); }
+.code-block .num { color: var(--blue); }
+
+.copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(79,142,247,0.1);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover { background: rgba(79,142,247,0.2); color: var(--cyan); }
+
+/* ── EXAMPLES ── */
+.examples-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  margin-top: 3rem;
+}
+
+.example-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  transition: border-color 0.3s;
+}
+
+.example-card:hover { border-color: rgba(79,142,247,0.35); }
+
+.example-card.reverse { direction: rtl; }
+.example-card.reverse > * { direction: ltr; }
+
+.example-preview {
+  background: #060810;
+  border-radius: 8px;
+  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.example-label {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: rgba(0,0,0,0.6);
+  padding: 0.25rem 0.6rem;
+  border-radius: 3px;
+}
+
+.example-info h3 {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.2rem;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.example-info p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-bottom: 1.25rem;
+  line-height: 1.7;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  letter-spacing: 0.08em;
+}
+
+.tag-blue { background: rgba(79,142,247,0.12); color: var(--blue); border: 1px solid rgba(79,142,247,0.2); }
+.tag-gold { background: rgba(245,200,66,0.1); color: var(--gold); border: 1px solid rgba(245,200,66,0.2); }
+.tag-green { background: rgba(80,250,123,0.1); color: var(--green); border: 1px solid rgba(80,250,123,0.2); }
+.tag-pink { background: rgba(255,107,157,0.1); color: var(--pink); border: 1px solid rgba(255,107,157,0.2); }
+
+.code-full {
+  background: #060810;
+  border: 1px solid rgba(79,142,247,0.12);
+  border-radius: 6px;
+  padding: 1.25rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.78rem;
+  line-height: 1.8;
+  overflow-x: auto;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+/* Scrollbar */
+.code-full::-webkit-scrollbar { width: 4px; height: 4px; }
+.code-full::-webkit-scrollbar-track { background: transparent; }
+.code-full::-webkit-scrollbar-thumb { background: rgba(79,142,247,0.3); border-radius: 2px; }
+
+/* ── ANIMATIONS ── */
+/* Example 1: Circle → Square */
+@keyframes drawCircle {
+  from { stroke-dashoffset: 502; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes morphToSquare {
+  0%, 40% { d: path("M 150,150 m -80,0 a 80,80 0 1,0 160,0 a 80,80 0 1,0 -160,0"); opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.anim-circle {
+  stroke-dasharray: 502;
+  stroke-dashoffset: 502;
+  animation: drawCircle 2s ease forwards, morphToSquare 4s 2s ease infinite;
+}
+
+@keyframes squareDraw {
+  0% { stroke-dashoffset: 480; opacity: 0; }
+  30% { opacity: 1; }
+  70% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.anim-square {
+  stroke-dasharray: 480;
+  stroke-dashoffset: 480;
+  animation: squareDraw 3s 1.5s ease forwards;
+}
+
+@keyframes textAppear {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.anim-text { animation: textAppear 0.8s 3.5s ease both; }
+
+/* Example 2: Function graph */
+@keyframes drawLine {
+  from { stroke-dashoffset: 800; }
+  to { stroke-dashoffset: 0; }
+}
+
+.graph-line {
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  animation: drawLine 3s 0.5s ease forwards;
+}
+
+@keyframes dotPop {
+  0% { r: 0; opacity: 0; }
+  60% { r: 6; opacity: 1; }
+  100% { r: 5; opacity: 1; }
+}
+
+.graph-dot { animation: dotPop 0.4s ease both; }
+.graph-dot:nth-child(1) { animation-delay: 3.5s; }
+.graph-dot:nth-child(2) { animation-delay: 3.7s; }
+.graph-dot:nth-child(3) { animation-delay: 3.9s; }
+
+/* Example 3: Matrix transform */
+@keyframes gridFade {
+  0% { opacity: 0; stroke-dashoffset: 200; }
+  100% { opacity: 0.4; stroke-dashoffset: 0; }
+}
+
+.grid-line {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: gridFade 1.5s ease both;
+}
+
+@keyframes vectorDraw {
+  from { stroke-dashoffset: 120; opacity: 0; }
+  to { stroke-dashoffset: 0; opacity: 1; }
+}
+
+.vec { stroke-dasharray: 120; stroke-dashoffset: 120; }
+.vec1 { animation: vectorDraw 0.8s 1.5s ease both; }
+.vec2 { animation: vectorDraw 0.8s 2.2s ease both; }
+.vec3 { animation: vectorDraw 0.8s 2.9s ease both; }
+.vec4 { animation: vectorDraw 0.8s 3.6s ease both; }
+
+/* Example 4: Fourier circle */
+@keyframes spinBig {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinSmall {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.fourier-arm {
+  transform-origin: 160px 130px;
+  animation: spinBig 4s linear infinite;
+}
+
+.fourier-arm2 {
+  transform-origin: 200px 130px;
+  animation: spinSmall 1.5s linear infinite reverse;
+}
+
+/* ── CONCEPTS ── */
+.concepts-section {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.concepts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-top: 3rem;
+}
+
+.concept-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  transition: all 0.25s;
+  cursor: default;
+}
+
+.concept-card:hover {
+  border-color: rgba(79,142,247,0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.concept-icon {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin: 0 auto 1rem;
+}
+
+.concept-card h4 {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.concept-card p {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── FOOTER ── */
+footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 3rem 2rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+}
+
+footer a { color: var(--cyan); text-decoration: none; }
+
+/* ── KEYFRAMES ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* ── CANVAS HERO ANIMATION ── */
+canvas { display: block; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.25rem; }
+  nav ul { display: none; }
+  .what-grid, .example-card, .install-steps, .concepts-grid { grid-template-columns: 1fr; }
+  .example-card.reverse { direction: ltr; }
+  .hero h1 { font-size: 2rem; }
+  section { padding: 4rem 1.25rem; }
+}
+
+/* ── SCROLL REVEAL ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.highlight-box {
+  background: linear-gradient(135deg, rgba(79,142,247,0.08), rgba(0,212,255,0.05));
+  border: 1px solid rgba(79,142,247,0.2);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.highlight-box strong { color: var(--cyan); }
+
+/* Loop animation for previews */
+.preview-loop { animation-iteration-count: infinite !important; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">manim<span>.community</span></div>
+  <ul>
+    <li><a href="#what">О библиотеке</a></li>
+    <li><a href="#install">Установка</a></li>
+    <li><a href="#examples">Примеры</a></li>
+    <li><a href="#concepts">Концепции</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <canvas class="hero-canvas" id="heroCanvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-tag">Python · Математика · Анимация</div>
+    <h1>
+      Оживи<br>
+      <span class="accent">математику</span><br>
+      <span class="accent2">кодом</span>
+    </h1>
+    <p>
+      Manim Community — библиотека Python для создания точных математических анимаций. 
+      Та самая, благодаря которой существует канал 3Blue1Brown.
+    </p>
+    <div class="hero-btns">
+      <a href="#examples" class="btn btn-primary">Смотреть примеры</a>
+      <a href="#install" class="btn btn-outline">Установить</a>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT IS MANIM -->
+<section id="what">
+  <div class="container">
+    <div class="section-label">Что такое Manim</div>
+    <h2 class="section-title">Математика,<br>рассказанная визуально</h2>
+
+    <div class="what-grid reveal">
+      <div class="what-text">
+        <p>
+          <strong>Manim</strong> (Mathematical Animation Engine) — это библиотека Python, 
+          разработанная Грантом Сандерсоном (<em>3Blue1Brown</em>) для создания видеороликов 
+          по математике. Сообщество разработчиков создало собственный форк — 
+          <strong>Manim Community</strong> — с лучшей документацией и поддержкой.
+        </p>
+        <p>
+          С помощью Manim можно описать любой математический объект — от простого кружка 
+          до сложного преобразования Фурье — и анимировать его с точностью до пикселя.
+        </p>
+        <p>
+          Каждая сцена — это Python-класс. Каждый объект — <em>Mobject</em>. 
+          Каждое движение — <em>Animation</em>. Вся логика — в методе <code style="color:var(--cyan);font-family:'Fira Code',monospace">construct()</code>.
+        </p>
+        <div class="highlight-box">
+          💡 <strong>Для научной работы:</strong> Manim идеально подходит для создания 
+          иллюстраций к теоремам, визуализации алгоритмов, объяснения геометрических 
+          доказательств и анимации статистических концепций.
+        </div>
+      </div>
+
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="info-icon">🎬</div>
+          <div>
+            <h4>Векторная точность</h4>
+            <p>Все объекты рендерятся как векторная графика — никаких пикселей при масштабировании.</p>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">🐍</div>
+          <div>
+            <h4>Чистый Python</h4>
+            <p>Никаких GUI, никаких таймлайнов. Только код. Легко версионировать и воспроизводить.</p>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">🎨</div>
+          <div>
+            <h4>LaTeX из коробки</h4>
+            <p>Формулы рендерятся через LaTeX — красиво, точно, профессионально.</p>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-icon">📐</div>
+          <div>
+            <h4>Координатные системы</h4>
+            <p>Оси, сетки, графики функций, трёхмерные сцены — всё встроено.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<section id="install" class="install-section">
+  <div class="container">
+    <div class="section-label">Установка</div>
+    <h2 class="section-title">Начать за 3 шага</h2>
+
+    <div class="install-steps reveal">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h4>Зависимости</h4>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem">
+          Установите Python 3.8+ и необходимые системные пакеты:
+        </p>
+        <div class="code-block">
+          <span class="comment"># macOS (Homebrew)</span><br>
+          brew install ffmpeg<br><br>
+          <span class="comment"># Ubuntu/Debian</span><br>
+          sudo apt install ffmpeg<br>
+          sudo apt install texlive-full
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">02</div>
+        <h4>Установка Manim</h4>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem">
+          Установите библиотеку через pip:
+        </p>
+        <div class="code-block">
+          <span class="comment"># Создайте виртуальное окружение</span><br>
+          python -m venv manim-env<br>
+          source manim-env/bin/activate<br><br>
+          <span class="comment"># Установите Manim</span><br>
+          pip install manim
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">03</div>
+        <h4>Первый запуск</h4>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.75rem">
+          Создайте файл и запустите рендер:
+        </p>
+        <div class="code-block">
+          <span class="comment"># Низкое качество (быстро)</span><br>
+          manim -ql scene.py MyScene<br><br>
+          <span class="comment"># Высокое качество (1080p)</span><br>
+          manim -qh scene.py MyScene<br><br>
+          <span class="comment"># Превью в реальном времени</span><br>
+          manim -p scene.py MyScene
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXAMPLES -->
+<section id="examples">
+  <div class="container">
+    <div class="section-label">Примеры кода</div>
+    <h2 class="section-title">От простого<br>к сложному</h2>
+
+    <div class="examples-grid">
+
+      <!-- EXAMPLE 1: Shapes -->
+      <div class="example-card reveal">
+        <div>
+          <div class="example-preview">
+            <div class="example-label">АНИМАЦИЯ</div>
+            <svg viewBox="0 0 320 200" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0">
+              <!-- Axes hint lines -->
+              <line x1="0" y1="100" x2="320" y2="100" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+              <line x1="160" y1="0" x2="160" y2="200" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+              <!-- Circle -->
+              <circle class="anim-circle" cx="120" cy="100" r="55"
+                fill="none" stroke="#4f8ef7" stroke-width="2.5"
+                stroke-linecap="round"/>
+              <!-- Square -->
+              <rect class="anim-square" x="180" y="58" width="90" height="90"
+                fill="none" stroke="#f5c842" stroke-width="2.5"
+                stroke-linecap="round" stroke-dasharray="480" stroke-dashoffset="480"/>
+              <!-- Labels -->
+              <text class="anim-text" x="120" y="175" text-anchor="middle"
+                fill="#4f8ef7" font-family="'Fira Code', monospace" font-size="11">Circle()</text>
+              <text class="anim-text" x="225" y="175" text-anchor="middle"
+                fill="#f5c842" font-family="'Fira Code', monospace" font-size="11">Square()</text>
+            </svg>
+          </div>
+        </div>
+        <div class="example-info">
+          <h3>Фигуры и трансформации</h3>
+          <p>
+            Базовые геометрические объекты — <em>Circle</em>, <em>Square</em>, <em>Triangle</em> — 
+            анимируются через метод <code style="color:var(--cyan);font-family:'Fira Code',monospace">play()</code>. 
+            Можно рисовать контур, заливать цветом, трансформировать одну фигуру в другую.
+          </p>
+          <div class="tags">
+            <span class="tag tag-blue">Geometry</span>
+            <span class="tag tag-gold">Create / Write</span>
+            <span class="tag tag-green">Transform</span>
+          </div>
+          <div class="code-full">
+<span class="keyword">from</span> manim <span class="keyword">import</span> *
+
+<span class="keyword">class</span> <span class="cls">ShapesScene</span>(Scene):
+    <span class="keyword">def</span> <span class="func">construct</span>(<span class="keyword">self</span>):
+        <span class="comment"># Создаём фигуры</span>
+        circle = <span class="cls">Circle</span>(
+            radius=<span class="num">1.5</span>,
+            color=<span class="cls">BLUE</span>
+        )
+        square = <span class="cls">Square</span>(
+            side_length=<span class="num">2</span>,
+            color=<span class="cls">YELLOW</span>
+        )
+
+        <span class="comment"># Размещаем рядом</span>
+        circle.shift(<span class="cls">LEFT</span> * <span class="num">2</span>)
+        square.shift(<span class="cls">RIGHT</span> * <span class="num">2</span>)
+
+        <span class="comment"># Рисуем контур</span>
+        <span class="keyword">self</span>.play(<span class="cls">Create</span>(circle))
+        <span class="keyword">self</span>.play(<span class="cls">Create</span>(square))
+        <span class="keyword">self</span>.wait(<span class="num">1</span>)
+
+        <span class="comment"># Трансформируем круг в квадрат</span>
+        <span class="keyword">self</span>.play(
+            <span class="cls">Transform</span>(circle, square),
+            run_time=<span class="num">2</span>
+        )
+        <span class="keyword">self</span>.wait(<span class="num">1</span>)
+          </div>
+        </div>
+      </div>
+
+      <!-- EXAMPLE 2: Function graph -->
+      <div class="example-card reverse reveal">
+        <div>
+          <div class="example-preview">
+            <div class="example-label">АНИМАЦИЯ</div>
+            <svg viewBox="0 0 320 200" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0">
+              <!-- Grid -->
+              <line x1="40" y1="20" x2="40" y2="180" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" marker-end="url(#arrW)"/>
+              <line x1="20" y1="160" x2="300" y2="160" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" marker-end="url(#arrW)"/>
+              <defs>
+                <marker id="arrW" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="rgba(255,255,255,0.3)"/>
+                </marker>
+              </defs>
+              <!-- Grid lines -->
+              <line x1="95" y1="25" x2="95" y2="160" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+              <line x1="150" y1="25" x2="150" y2="160" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+              <line x1="205" y1="25" x2="205" y2="160" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+              <line x1="260" y1="25" x2="260" y2="160" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+              <line x1="40" y1="110" x2="295" y2="110" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+              <line x1="40" y1="60" x2="295" y2="60" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+              <!-- sin curve -->
+              <path class="graph-line"
+                d="M40,160 Q60,160 70,130 T110,70 T150,130 T190,70 T230,130 T265,90 T295,100"
+                fill="none" stroke="#50fa7b" stroke-width="2.5" stroke-linecap="round"/>
+              <!-- Dots -->
+              <circle class="graph-dot" cx="110" cy="70" r="0" fill="#f5c842"/>
+              <circle class="graph-dot" cx="190" cy="70" r="0" fill="#f5c842"/>
+              <circle class="graph-dot" cx="150" cy="130" r="0" fill="#ff6b9d"/>
+              <!-- Labels -->
+              <text x="298" y="163" fill="rgba(255,255,255,0.4)" font-family="'Fira Code',monospace" font-size="10">x</text>
+              <text x="43" y="18" fill="rgba(255,255,255,0.4)" font-family="'Fira Code',monospace" font-size="10">y</text>
+              <text x="60" y="178" fill="rgba(255,255,255,0.3)" font-family="'Fira Code',monospace" font-size="9">sin(x)</text>
+            </svg>
+          </div>
+        </div>
+        <div class="example-info">
+          <h3>Графики функций</h3>
+          <p>
+            <em>Axes</em> создаёт систему координат. Метод 
+            <code style="color:var(--cyan);font-family:'Fira Code',monospace">plot()</code> 
+            строит любую функцию Python. Можно анимировать построение, добавлять метки, 
+            подсвечивать области под графиком.
+          </p>
+          <div class="tags">
+            <span class="tag tag-green">Axes</span>
+            <span class="tag tag-blue">plot()</span>
+            <span class="tag tag-pink">MathTex</span>
+          </div>
+          <div class="code-full">
+<span class="keyword">from</span> manim <span class="keyword">import</span> *
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">class</span> <span class="cls">FunctionGraph</span>(Scene):
+    <span class="keyword">def</span> <span class="func">construct</span>(<span class="keyword">self</span>):
+        <span class="comment"># Создаём оси</span>
+        axes = <span class="cls">Axes</span>(
+            x_range=[-<span class="num">4</span>, <span class="num">4</span>, <span class="num">1</span>],
+            y_range=[-<span class="num">2</span>, <span class="num">2</span>, <span class="num">1</span>],
+            axis_config={<span class="string">"color"</span>: <span class="cls">WHITE</span>},
+        )
+
+        <span class="comment"># Строим функцию sin(x)</span>
+        graph = axes.plot(
+            <span class="keyword">lambda</span> x: np.sin(x),
+            color=<span class="cls">GREEN</span>,
+            x_range=[-<span class="num">4</span>, <span class="num">4</span>]
+        )
+
+        <span class="comment"># Подпись формулы через LaTeX</span>
+        label = axes.get_graph_label(
+            graph,
+            label=<span class="cls">MathTex</span>(<span class="string">r"\sin(x)"</span>)
+        )
+
+        <span class="comment"># Анимация построения</span>
+        <span class="keyword">self</span>.play(
+            <span class="cls">Create</span>(axes),
+            run_time=<span class="num">1</span>
+        )
+        <span class="keyword">self</span>.play(
+            <span class="cls">Create</span>(graph),
+            run_time=<span class="num">2</span>
+        )
+        <span class="keyword">self</span>.play(
+            <span class="cls">Write</span>(label)
+        )
+        <span class="keyword">self</span>.wait()
+          </div>
+        </div>
+      </div>
+
+      <!-- EXAMPLE 3: Matrix / Linear Algebra -->
+      <div class="example-card reveal">
+        <div>
+          <div class="example-preview">
+            <div class="example-label">АНИМАЦИЯ</div>
+            <svg viewBox="0 0 320 200" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0">
+              <!-- Grid base -->
+              <g opacity="0.25">
+                <line class="grid-line" x1="30" y1="100" x2="290" y2="100" stroke="#4f8ef7" stroke-width="1" style="animation-delay:0s"/>
+                <line class="grid-line" x1="160" y1="20" x2="160" y2="180" stroke="#4f8ef7" stroke-width="1" style="animation-delay:0.1s"/>
+                <line class="grid-line" x1="30" y1="60" x2="290" y2="60" stroke="#4f8ef7" stroke-width="0.7" style="animation-delay:0.2s"/>
+                <line class="grid-line" x1="30" y1="140" x2="290" y2="140" stroke="#4f8ef7" stroke-width="0.7" style="animation-delay:0.3s"/>
+                <line class="grid-line" x1="120" y1="20" x2="120" y2="180" stroke="#4f8ef7" stroke-width="0.7" style="animation-delay:0.4s"/>
+                <line class="grid-line" x1="200" y1="20" x2="200" y2="180" stroke="#4f8ef7" stroke-width="0.7" style="animation-delay:0.5s"/>
+                <line class="grid-line" x1="80" y1="20" x2="80" y2="180" stroke="#4f8ef7" stroke-width="0.5" style="animation-delay:0.6s"/>
+                <line class="grid-line" x1="240" y1="20" x2="240" y2="180" stroke="#4f8ef7" stroke-width="0.5" style="animation-delay:0.7s"/>
+              </g>
+              <!-- Vectors -->
+              <defs>
+                <marker id="arrB" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L8,3 L0,6 Z" fill="#4f8ef7"/>
+                </marker>
+                <marker id="arrG" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L8,3 L0,6 Z" fill="#50fa7b"/>
+                </marker>
+                <marker id="arrR" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L8,3 L0,6 Z" fill="#ff6b9d"/>
+                </marker>
+                <marker id="arrY" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L8,3 L0,6 Z" fill="#f5c842"/>
+                </marker>
+              </defs>
+              <!-- i hat -->
+              <line class="vec vec1" x1="160" y1="100" x2="200" y2="100"
+                stroke="#50fa7b" stroke-width="2.5" marker-end="url(#arrG)"/>
+              <!-- j hat -->
+              <line class="vec vec2" x1="160" y1="100" x2="160" y2="60"
+                stroke="#ff6b9d" stroke-width="2.5" marker-end="url(#arrR)"/>
+              <!-- transformed i -->
+              <line class="vec vec3" x1="160" y1="100" x2="220" y2="75"
+                stroke="#f5c842" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrY)"/>
+              <!-- transformed j -->
+              <line class="vec vec4" x1="160" y1="100" x2="140" y2="55"
+                stroke="#4f8ef7" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrB)"/>
+              <!-- Labels -->
+              <text x="205" y="98" fill="#50fa7b" font-family="'Fira Code',monospace" font-size="10" style="animation:textAppear 0.5s 2s both">î</text>
+              <text x="148" y="55" fill="#ff6b9d" font-family="'Fira Code',monospace" font-size="10" style="animation:textAppear 0.5s 2.5s both">ĵ</text>
+            </svg>
+          </div>
+        </div>
+        <div class="example-info">
+          <h3>Линейные преобразования</h3>
+          <p>
+            <em>NumberPlane</em> и <em>LinearTransformationScene</em> позволяют визуализировать 
+            действие матриц на пространство — как векторы сжимаются, растягиваются и вращаются. 
+            Отлично для лекций по линейной алгебре.
+          </p>
+          <div class="tags">
+            <span class="tag tag-blue">NumberPlane</span>
+            <span class="tag tag-gold">Vector</span>
+            <span class="tag tag-pink">ApplyMatrix</span>
+          </div>
+          <div class="code-full">
+<span class="keyword">from</span> manim <span class="keyword">import</span> *
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">class</span> <span class="cls">LinearTransform</span>(LinearTransformationScene):
+    CONFIG = {
+        <span class="string">"include_background_plane"</span>: <span class="keyword">True</span>,
+        <span class="string">"show_coordinates"</span>: <span class="keyword">True</span>,
+    }
+
+    <span class="keyword">def</span> <span class="func">construct</span>(<span class="keyword">self</span>):
+        <span class="comment"># Матрица трансформации</span>
+        matrix = np.array([
+            [<span class="num">1</span>, -<span class="num">1</span>],
+            [<span class="num">1</span>,  <span class="num">1</span>]
+        ])
+
+        <span class="comment"># Рисуем базисные векторы</span>
+        v1 = <span class="keyword">self</span>.add_vector(
+            [<span class="num">1</span>, <span class="num">0</span>], color=<span class="cls">GREEN</span>
+        )
+        v2 = <span class="keyword">self</span>.add_vector(
+            [<span class="num">0</span>, <span class="num">1</span>], color=<span class="cls">RED</span>
+        )
+        <span class="keyword">self</span>.wait()
+
+        <span class="comment"># Применяем матричное преобразование</span>
+        <span class="keyword">self</span>.apply_matrix(matrix)
+        <span class="keyword">self</span>.wait()
+
+        <span class="comment"># Показываем матрицу</span>
+        m = <span class="cls">Matrix</span>([[<span class="num">1</span>, -<span class="num">1</span>],[<span class="num">1</span>, <span class="num">1</span>]])
+        <span class="keyword">self</span>.play(<span class="cls">Write</span>(m))
+        <span class="keyword">self</span>.wait(<span class="num">2</span>)
+          </div>
+        </div>
+      </div>
+
+      <!-- EXAMPLE 4: LaTeX / Formula -->
+      <div class="example-card reverse reveal">
+        <div>
+          <div class="example-preview">
+            <div class="example-label">АНИМАЦИЯ</div>
+            <svg viewBox="0 0 320 200" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0">
+              <!-- Animated formula building up -->
+              <g style="animation:fadeUp 1s 0.3s both">
+                <text x="160" y="60" text-anchor="middle" fill="rgba(255,255,255,0.5)"
+                  font-family="serif" font-size="13" font-style="italic">Теорема Пифагора</text>
+              </g>
+              <g style="animation:fadeUp 0.8s 1s both">
+                <text x="160" y="100" text-anchor="middle" fill="white"
+                  font-family="serif" font-size="28" font-style="italic">a² + b² = c²</text>
+              </g>
+              <g style="animation:fadeUp 0.6s 2s both">
+                <!-- Right triangle -->
+                <polygon points="60,170 180,170 180,90" fill="none" stroke="#4f8ef7" stroke-width="2"/>
+                <text x="117" y="185" text-anchor="middle" fill="#4f8ef7" font-family="serif" font-size="14" font-style="italic">a</text>
+                <text x="190" y="135" fill="#50fa7b" font-family="serif" font-size="14" font-style="italic">b</text>
+                <text x="105" y="125" fill="#f5c842" font-family="serif" font-size="14" font-style="italic">c</text>
+                <!-- Right angle marker -->
+                <rect x="170" y="160" width="10" height="10" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+              </g>
+              <g style="animation:fadeUp 0.6s 2.8s both">
+                <text x="240" y="170" text-anchor="middle" fill="#50fa7b"
+                  font-family="'Fira Code',monospace" font-size="10">MathTex</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="example-info">
+          <h3>Формулы LaTeX и доказательства</h3>
+          <p>
+            <em>MathTex</em> и <em>Tex</em> рендерят любые LaTeX-формулы. 
+            Можно анимировать появление формул посимвольно, 
+            подсвечивать части выражений, показывать алгебраические шаги.
+          </p>
+          <div class="tags">
+            <span class="tag tag-pink">MathTex</span>
+            <span class="tag tag-gold">Write</span>
+            <span class="tag tag-blue">TransformMatchingTex</span>
+          </div>
+          <div class="code-full">
+<span class="keyword">from</span> manim <span class="keyword">import</span> *
+
+<span class="keyword">class</span> <span class="cls">PythagorasProof</span>(Scene):
+    <span class="keyword">def</span> <span class="func">construct</span>(<span class="keyword">self</span>):
+        <span class="comment"># Заголовок</span>
+        title = <span class="cls">Tex</span>(
+            <span class="string">"Теорема Пифагора"</span>,
+            font_size=<span class="num">36</span>
+        )
+        title.to_edge(<span class="cls">UP</span>)
+        <span class="keyword">self</span>.play(<span class="cls">Write</span>(title))
+
+        <span class="comment"># Формула</span>
+        formula = <span class="cls">MathTex</span>(
+            <span class="string">r"a^2 + b^2 = c^2"</span>,
+            font_size=<span class="num">56</span>
+        )
+        <span class="keyword">self</span>.play(<span class="cls">Write</span>(formula))
+        <span class="keyword">self</span>.wait()
+
+        <span class="comment"># Подсвечиваем части</span>
+        <span class="keyword">self</span>.play(
+            formula[<span class="num">0</span>][<span class="num">0</span>:<span class="num">2</span>].animate.set_color(<span class="cls">BLUE</span>),
+            formula[<span class="num">0</span>][<span class="num">3</span>:<span class="num">5</span>].animate.set_color(<span class="cls">GREEN</span>),
+            formula[<span class="num">0</span>][<span class="num">6</span>:<span class="num">8</span>].animate.set_color(<span class="cls">YELLOW</span>),
+        )
+
+        <span class="comment"># Треугольник</span>
+        triangle = <span class="cls">Polygon</span>(
+            [-<span class="num">2</span>, -<span class="num">2</span>, <span class="num">0</span>],
+            [<span class="num">2</span>, -<span class="num">2</span>, <span class="num">0</span>],
+            [<span class="num">2</span>, <span class="num">1</span>, <span class="num">0</span>],
+            color=<span class="cls">WHITE</span>
+        )
+        <span class="keyword">self</span>.play(
+            formula.animate.to_edge(<span class="cls">UP</span>),
+            <span class="cls">Create</span>(triangle)
+        )
+        <span class="keyword">self</span>.wait(<span class="num">2</span>)
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPTS -->
+<section id="concepts" class="concepts-section">
+  <div class="container">
+    <div class="section-label">Ключевые концепции</div>
+    <h2 class="section-title">Архитектура Manim</h2>
+
+    <div class="concepts-grid reveal">
+      <div class="concept-card">
+        <div class="concept-icon" style="background:rgba(79,142,247,0.12)">📦</div>
+        <h4>Mobject</h4>
+        <p>Mathematical Object — базовый класс всех объектов сцены. Круги, тексты, стрелки — всё Mobject.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon" style="background:rgba(80,250,123,0.1)">🎬</div>
+        <h4>Animation</h4>
+        <p>Описывает, как изменяется Mobject во времени. Create, Write, Transform, FadeIn...</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon" style="background:rgba(245,200,66,0.1)">🎭</div>
+        <h4>Scene</h4>
+        <p>Контейнер для всей сцены. Метод construct() — место, где описывается анимация.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon" style="background:rgba(255,107,157,0.1)">⏱️</div>
+        <h4>self.play()</h4>
+        <p>Запускает одну или несколько анимаций одновременно. run_time контролирует скорость.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon" style="background:rgba(255,179,71,0.1)">📐</div>
+        <h4>ValueTracker</h4>
+        <p>Хранит число, которое можно анимировать. Связывает параметры объектов через always_redraw.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon" style="background:rgba(79,142,247,0.12)">📝</div>
+        <h4>MathTex / Tex</h4>
+        <p>Рендерит LaTeX-формулы. MathTex для математики, Tex для обычного текста с формулами.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon" style="background:rgba(80,250,123,0.1)">📊</div>
+        <h4>Axes / NumberPlane</h4>
+        <p>Координатные системы для построения графиков и визуализации преобразований.</p>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon" style="background:rgba(245,200,66,0.1)">🔄</div>
+        <h4>Updater</h4>
+        <p>Функция, вызываемая каждый кадр. Позволяет создавать зависимые, реактивные объекты.</p>
+      </div>
+    </div>
+
+    <div class="highlight-box reveal" style="margin-top:2.5rem;max-width:700px">
+      <strong>Структура типичного скрипта:</strong><br><br>
+      <span style="color:var(--pink)">from</span> manim <span style="color:var(--pink)">import</span> *
+      &nbsp;&nbsp;<span style="color:#546e7a"># импортируем всё</span><br><br>
+      <span style="color:var(--pink)">class</span> <span style="color:var(--orange)">МояСцена</span>(Scene):<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--pink)">def</span> <span style="color:var(--cyan)">construct</span>(<span style="color:var(--pink)">self</span>):<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#546e7a"># создаём объекты...</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--pink)">self</span>.<span style="color:var(--cyan)">play</span>(...)&nbsp;&nbsp;<span style="color:#546e7a"># анимируем</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--pink)">self</span>.<span style="color:var(--cyan)">wait</span>(<span style="color:var(--blue)">1</span>)&nbsp;&nbsp;&nbsp;<span style="color:#546e7a"># пауза</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p style="margin-bottom:0.5rem">
+    <a href="https://www.manim.community/" target="_blank">manim.community</a>
+    &nbsp;·&nbsp;
+    <a href="https://docs.manim.community/" target="_blank">Документация</a>
+    &nbsp;·&nbsp;
+    <a href="https://3blue1brown.com" target="_blank">3Blue1Brown</a>
+  </p>
+  <p style="margin-top:0.75rem;font-size:0.68rem">
+    Сделано для научной работы · Manim Community Edition
+  </p>
+</footer>
+
+<script>
+// ── Hero canvas: floating particles + math symbols ──
+const canvas = document.getElementById('heroCanvas');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const symbols = ['∫', '∑', 'π', '∞', '∂', '√', '∇', 'λ', 'θ', 'φ', 'Δ', '≈', '∈', '⊕', '→'];
+const particles = Array.from({length: 40}, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  vx: (Math.random() - 0.5) * 0.3,
+  vy: (Math.random() - 0.5) * 0.3,
+  sym: symbols[Math.floor(Math.random() * symbols.length)],
+  size: 12 + Math.random() * 16,
+  opacity: 0.03 + Math.random() * 0.07,
+  r: Math.random() * 0.01 - 0.005,
+  angle: Math.random() * Math.PI * 2,
+}));
+
+function drawHero() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy; p.angle += p.r;
+    if (p.x < -30) p.x = canvas.width + 30;
+    if (p.x > canvas.width + 30) p.x = -30;
+    if (p.y < -30) p.y = canvas.height + 30;
+    if (p.y > canvas.height + 30) p.y = -30;
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle);
+    ctx.font = `${p.size}px 'Libre Baskerville', serif`;
+    ctx.fillStyle = `rgba(79,142,247,${p.opacity})`;
+    ctx.textAlign = 'center';
+    ctx.fillText(p.sym, 0, 0);
+    ctx.restore();
+  });
+  requestAnimationFrame(drawHero);
+}
+drawHero();
+
+// ── Scroll reveal ──
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.12 });
+
+reveals.forEach(el => observer.observe(el));
+
+// ── Copy buttons ──
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const block = btn.parentElement;
+    const text = block.innerText.replace('Копировать', '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Скопировано';
+      setTimeout(() => btn.textContent = 'Копировать', 2000);
+    });
+  });
+});
+</script>
+</body>
+</html>
